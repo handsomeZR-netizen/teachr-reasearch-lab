@@ -47,6 +47,9 @@ export function APIConfigDialog({ open, onOpenChange }: APIConfigDialogProps) {
   const [errors, setErrors] = useState<Partial<Record<keyof APIConfig, string>>>({});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Check if using default cloud API
+  const isUsingDefaultAPI = !apiConfig?.apiKey && process.env.NEXT_PUBLIC_DEFAULT_API_KEY;
+
   // Load existing config when dialog opens
   useEffect(() => {
     if (open && apiConfig) {
@@ -134,6 +137,19 @@ export function APIConfigDialog({ open, onOpenChange }: APIConfigDialogProps) {
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {/* Default API Info */}
+          {isUsingDefaultAPI && (
+            <div className="flex gap-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+              <div className="text-sm text-text-secondary">
+                <p className="font-medium text-primary mb-1">当前使用免费云端 API</p>
+                <p>
+                  系统正在使用默认的 DeepSeek API（免费额度有限）。
+                  您可以配置自己的 API Key 以解除限制并获得更好的性能。
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Warning Message */}
           <div className="flex gap-3 p-3 bg-warning/10 border border-warning/20 rounded-lg">
             <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />

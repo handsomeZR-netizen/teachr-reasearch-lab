@@ -92,7 +92,25 @@ Netlify 会自动从 `netlify.toml` 读取配置，但你也可以手动确认�
 - **Branch to deploy**: `main`
 - **Build command**: `npm run build`
 - **Publish directory**: `out`
-- **Node version**: 18
+- **Node version**: 20
+
+#### 步骤 3.5: 配置环境变量（可选）
+
+项目已在 `netlify.toml` 中配置了默认的免费 DeepSeek API Key，用户可以直接使用。
+
+如果你想使用自己的 API Key 作为默认配置：
+
+1. 在 Netlify 项目设置中，点击 **"Site settings"** → **"Environment variables"**
+2. 添加以下环境变量：
+   - `NEXT_PUBLIC_DEFAULT_API_KEY`: 你的 DeepSeek API Key
+   - `NEXT_PUBLIC_DEFAULT_API_BASE_URL`: `https://api.deepseek.com/v1`
+   - `NEXT_PUBLIC_DEFAULT_API_MODEL`: `deepseek-chat`
+3. 保存后重新部署
+
+**注意**: 
+- 环境变量会覆盖 `netlify.toml` 中的配置
+- 用户仍然可以在应用中配置自己的 API Key
+- 详细说明请参考 [环境变量配置指南](./ENVIRONMENT_VARIABLES.md)
 
 #### 步骤 4: 部署
 

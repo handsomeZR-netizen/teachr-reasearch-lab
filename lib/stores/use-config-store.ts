@@ -54,14 +54,26 @@ const decodeKey = (encoded: string): string => {
 };
 
 /**
- * Default API configuration (shared endpoint with limits)
+ * Get default API configuration from environment variables or fallback
  */
-const DEFAULT_CONFIG: APIConfig = {
-  provider: 'deepseek',
-  baseURL: 'https://api.deepseek.com/v1',
-  apiKey: '', // Empty by default - user must configure
-  model: 'deepseek-chat',
+const getDefaultConfig = (): APIConfig => {
+  // Try to get from environment variables (set by Netlify or other hosting)
+  const envApiKey = process.env.NEXT_PUBLIC_DEFAULT_API_KEY;
+  const envBaseURL = process.env.NEXT_PUBLIC_DEFAULT_API_BASE_URL;
+  const envModel = process.env.NEXT_PUBLIC_DEFAULT_API_MODEL;
+  
+  return {
+    provider: 'deepseek',
+    baseURL: envBaseURL || 'https://api.deepseek.com/v1',
+    apiKey: envApiKey || '', // Use env API key if available
+    model: envModel || 'deepseek-chat',
+  };
 };
+
+/**
+ * Default API configuration (from environment or fallback)
+ */
+const DEFAULT_CONFIG: APIConfig = getDefaultConfig();
 
 /**
  * Configuration store with localStorage persistence
@@ -128,17 +140,22 @@ export const useConfigStore = create<ConfigStore>()(
       
       /**
        * Get decrypted configuration for API calls
+       * Priority: User config > Environment variables > Default
        */
       getDecryptedConfig: () => {
         const state = get();
-        if (!state.apiConfig) {
-          return DEFAULT_CONFIG;
+        const defaultConfig = getDefaultConfig();
+        
+        // If user has configured their own API, use it
+        if (state.apiConfig?.apiKey) {
+          return {
+            ...state.apiConfig,
+            apiKey: state.apiConfig.apiKey, // Already decrypted in memory
+          };
         }
         
-        return {
-          ...state.apiConfig,
-          apiKey: state.apiConfig.apiKey, // Already decrypted in memory
-        };
+        // Otherwise, use environment variables or default
+        return defaultConfig;
       },
     }),
     {
