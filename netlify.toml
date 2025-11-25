@@ -9,7 +9,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # Default DeepSeek API configuration (free tier)
-  NEXT_PUBLIC_DEFAULT_API_KEY = "sk-b363adbc72a44d47b02f9c1cc48afb47"
+  # API configuration - Set these in Netlify Dashboard > Site settings > Environment variables
+  # NEXT_PUBLIC_DEFAULT_API_KEY = "your-api-key-here"
   NEXT_PUBLIC_DEFAULT_API_BASE_URL = "https://api.deepseek.com/v1"
   NEXT_PUBLIC_DEFAULT_API_MODEL = "deepseek-chat"

@@ -10,16 +10,23 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Settings, BookOpen, FlaskConical, Home, FolderOpen, Menu, X } from 'lucide-react';
+import { Settings, BookOpen, FlaskConical, Home, FolderOpen, Menu, X, Cloud, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APIConfigDialog } from '@/components/api-config-dialog';
 import { SessionManagerDialog } from '@/components/session-manager-dialog';
+import { useConfigStore, isCloudAPIAvailable } from '@/lib/stores/use-config-store';
 import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false);
   const [isSessionManagerOpen, setIsSessionManagerOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const { useCloudAPI, apiConfig } = useConfigStore();
+  const cloudAvailable = isCloudAPIAvailable();
+  
+  // Determine current API mode
+  const isUsingCloud = cloudAvailable && (useCloudAPI || !apiConfig?.apiKey);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -73,12 +80,22 @@ export function Navbar() {
             <Button
               id="api-config-button"
               variant="ghost"
-              size="icon"
               onClick={() => setIsConfigDialogOpen(true)}
-              className="text-text-secondary hover:text-primary"
+              className="text-text-secondary hover:text-primary gap-1.5 px-2"
               aria-label="API 设置"
             >
-              <Settings className="w-5 h-5" />
+              {isUsingCloud ? (
+                <>
+                  <Cloud className="w-4 h-4 text-primary" />
+                  <span className="text-xs text-primary hidden sm:inline">云端</span>
+                </>
+              ) : (
+                <>
+                  <Key className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs text-orange-500 hidden sm:inline">自定义</span>
+                </>
+              )}
+              <Settings className="w-4 h-4" />
             </Button>
             
             {/* Mobile Menu Toggle */}

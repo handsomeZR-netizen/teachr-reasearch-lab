@@ -18,15 +18,18 @@ interface ConfigStore {
   // State
   apiConfig: APIConfig | null;
   isConfigured: boolean;
+  useCloudAPI: boolean; // Whether to use cloud API (default) or custom
   
   // Actions
   setAPIConfig: (config: APIConfig) => void;
   loadConfig: () => void;
   saveConfig: (config: APIConfig) => void;
   clearConfig: () => void;
+  setUseCloudAPI: (useCloud: boolean) => void;
   
   // Utility
   getDecryptedConfig: () => APIConfig | null;
+  isUsingCloudAPI: () => boolean;
 }
 
 /**
@@ -51,6 +54,13 @@ const decodeKey = (encoded: string): string => {
     console.error('[Config Store] Failed to decode API key:', error);
     return encoded;
   }
+};
+
+/**
+ * Check if cloud API is available (environment variables are set)
+ */
+export const isCloudAPIAvailable = (): boolean => {
+  return !!process.env.NEXT_PUBLIC_DEFAULT_API_KEY;
 };
 
 /**
@@ -81,9 +91,10 @@ const DEFAULT_CONFIG: APIConfig = getDefaultConfig();
 export const useConfigStore = create<ConfigStore>()(
   persist(
     (set, get) => ({
-      // Initial state
+      // Initial state - default to using cloud API if available
       apiConfig: null,
       isConfigured: false,
+      useCloudAPI: true, // Default to cloud API
       
       /**
        * Set API configuration and mark as configured
@@ -92,6 +103,7 @@ export const useConfigStore = create<ConfigStore>()(
         set({
           apiConfig: config,
           isConfigured: !!config.apiKey,
+          useCloudAPI: false, // Switch to custom when user sets config
         });
       },
       
@@ -121,6 +133,7 @@ export const useConfigStore = create<ConfigStore>()(
         set({
           apiConfig: config,
           isConfigured: !!config.apiKey,
+          useCloudAPI: false, // Switch to custom when user saves config
         });
         
         // Persist middleware will handle localStorage save
@@ -128,23 +141,49 @@ export const useConfigStore = create<ConfigStore>()(
       },
       
       /**
-       * Clear configuration and reset to default
+       * Clear configuration and reset to cloud API
        */
       clearConfig: () => {
         set({
           apiConfig: null,
           isConfigured: false,
+          useCloudAPI: true, // Reset to cloud API
         });
-        console.log('[Config Store] Configuration cleared');
+        console.log('[Config Store] Configuration cleared, using cloud API');
+      },
+      
+      /**
+       * Toggle between cloud API and custom API
+       */
+      setUseCloudAPI: (useCloud: boolean) => {
+        set({ useCloudAPI: useCloud });
+        console.log(`[Config Store] Switched to ${useCloud ? 'cloud' : 'custom'} API`);
+      },
+      
+      /**
+       * Check if currently using cloud API
+       */
+      isUsingCloudAPI: () => {
+        const state = get();
+        const cloudAvailable = isCloudAPIAvailable();
+        
+        // Use cloud if: cloud is available AND (useCloudAPI is true OR no custom config)
+        return cloudAvailable && (state.useCloudAPI || !state.apiConfig?.apiKey);
       },
       
       /**
        * Get decrypted configuration for API calls
-       * Priority: User config > Environment variables > Default
+       * Priority: Cloud API (if enabled) > User config > Default
        */
       getDecryptedConfig: () => {
         const state = get();
         const defaultConfig = getDefaultConfig();
+        const cloudAvailable = isCloudAPIAvailable();
+        
+        // If using cloud API and it's available, use it
+        if (state.useCloudAPI && cloudAvailable) {
+          return defaultConfig;
+        }
         
         // If user has configured their own API, use it
         if (state.apiConfig?.apiKey) {
@@ -154,7 +193,7 @@ export const useConfigStore = create<ConfigStore>()(
           };
         }
         
-        // Otherwise, use environment variables or default
+        // Fallback to default (cloud if available)
         return defaultConfig;
       },
     }),
