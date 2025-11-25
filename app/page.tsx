@@ -65,10 +65,12 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* 3D UI Mockup - AI 对话界面样机 */}
+            {/* 3D UI Mockup - AI 对话界面样机 - 可点击跳转到精选案例 */}
+            <Link href="/cases/featured" className="block cursor-pointer group">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, rotateY: -5 }}
               animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+              whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative perspective-1000"
               style={{ perspective: '1000px' }}
@@ -241,7 +243,20 @@ export default function Home() {
                   ✓ 教案已生成
                 </motion.div>
               </motion.div>
+
+              {/* 点击提示 */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5 }}
+                className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
+                <div className="bg-text-primary/90 text-white text-xs px-3 py-1.5 rounded-full whitespace-nowrap">
+                  点击查看完整研究案例 →
+                </div>
+              </motion.div>
             </motion.div>
+            </Link>
           </div>
         </section>
 
