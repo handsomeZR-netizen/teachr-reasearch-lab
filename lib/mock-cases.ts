@@ -25,18 +25,18 @@ export const MOCK_CASES: CaseData[] = [
   // Math Cases
   {
     id: 'math-001',
-    title: '函数概念教学中的认知障碍研究',
-    description: '通过模拟不同认知水平学生，探索函数抽象概念的教学策略，发现具体实例引入能有效降低认知负荷。',
+    title: 'GenAI驱动下小学数学"认知脚手架"构建与迭代验证——基于《圆的认识》的生成式模拟教学研究',
+    description: '通过生成式AI模拟不同认知水平学生，探索《圆的认识》教学中认知脚手架的构建与动态调整策略，验证脚手架的有效性。',
     subject: '数学',
     subjectId: 'math',
-    grade: '高一',
-    author: '张老师',
+    grade: '小学五年级',
+    author: '陈老师',
     likes: 128,
-    content: '本研究聚焦高一学生在学习函数概念时遇到的认知障碍...',
-    researchTopic: '高中函数概念教学中学生认知障碍的识别与突破策略',
-    literatureReview: '函数概念是高中数学的核心内容，Dubinsky (1991) 的APOS理论指出...',
-    teachingApproach: '采用"具体→抽象→应用"的三阶段教学法...',
-    findings: '研究发现，通过模拟教学，B类学生在引入生活实例后理解度提升40%...',
+    content: '本研究聚焦小学五年级学生在学习《圆的认识》时的认知脚手架构建...',
+    researchTopic: 'GenAI驱动下小学数学"认知脚手架"构建与迭代验证——基于《圆的认识》的生成式模拟教学研究',
+    literatureReview: '认知脚手架理论源于维果茨基的最近发展区理论，Wood等人(1976)首次提出教学支架概念...',
+    teachingApproach: '采用"概念脚手架→程序脚手架→策略脚手架→元认知脚手架"的四维教学框架...',
+    findings: '研究发现，通过两轮模拟教学迭代，优化后的认知脚手架使B类学生理解度提升45%，C类学生参与度提升60%...',
     isFeatured: true, // 精选完整案例
   },
   {
