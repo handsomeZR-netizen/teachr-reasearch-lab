@@ -37,7 +37,7 @@ export const FEATURED_CASE: FeaturedCaseData = {
   subtitle: '基于《圆的认识》的生成式模拟教学研究',
   description: '一个完整的模拟教学研究故事，展示如何利用AI工具完成从选题到成果的科研闭环。',
   subject: '数学',
-  grade: '小学高年级',
+  grade: '小学五年级',
   author: '研究团队',
   likes: 256,
   researchTopic: 'GenAI驱动下小学数学"认知脚手架"构建与迭代验证——基于《圆的认识》的生成式模拟教学研究',
