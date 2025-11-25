@@ -50,7 +50,7 @@ export default function WorkshopPage() {
     markReportGenerated,
   } = useResearchStore();
   
-  const apiConfig = useConfigStore((state) => state.apiConfig);
+  const getDecryptedConfig = useConfigStore((state) => state.getDecryptedConfig);
   const [isInitialized, setIsInitialized] = useState(false);
   
   const [currentStepState, setCurrentStepState] = useState<1 | 2 | 3 | 4>(1);
@@ -143,7 +143,8 @@ export default function WorkshopPage() {
     subject: string,
     challenge: string
   ): Promise<Array<{ title: string; rationale: string }>> => {
-    if (!apiConfig) {
+    const apiConfig = getDecryptedConfig();
+    if (!apiConfig?.apiKey) {
       throw new Error('请先配置 API 设置');
     }
 
@@ -190,7 +191,8 @@ export default function WorkshopPage() {
 
   // Handle literature review generation with caching
   const handleGenerateLiteratureReview = async (topic: string): Promise<string> => {
-    if (!apiConfig) {
+    const apiConfig = getDecryptedConfig();
+    if (!apiConfig?.apiKey) {
       throw new Error('请先配置 API 设置');
     }
     
@@ -239,7 +241,8 @@ export default function WorkshopPage() {
 
   // Handle sending message in simulation
   const handleSendMessage = async (content: string) => {
-    if (!apiConfig) {
+    const apiConfig = getDecryptedConfig();
+    if (!apiConfig?.apiKey) {
       console.error('[Workshop] API config not set');
       return;
     }
@@ -330,7 +333,8 @@ export default function WorkshopPage() {
 
   // Handle improvement suggestions request
   const handleRequestImprovement = async () => {
-    if (!apiConfig) {
+    const apiConfig = getDecryptedConfig();
+    if (!apiConfig?.apiKey) {
       console.error('[Workshop] API config not set');
       return;
     }
@@ -372,7 +376,8 @@ export default function WorkshopPage() {
 
   // Handle conversation analysis with caching
   const handleAnalyzeConversation = async (): Promise<AnalysisResult> => {
-    if (!apiConfig) {
+    const apiConfig = getDecryptedConfig();
+    if (!apiConfig?.apiKey) {
       throw new Error('请先配置 API 设置');
     }
 
