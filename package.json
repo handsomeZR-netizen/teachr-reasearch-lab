@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "set TURBOPACK=0 && next dev",
+    "build": "set TURBOPACK=0 && next build",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",

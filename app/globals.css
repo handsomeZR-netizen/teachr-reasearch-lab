@@ -95,7 +95,11 @@
 body {
   background: var(--bg-main);
   color: var(--text-primary);
-  font-family: 'Inter', 'PingFang SC', 'Source Han Sans CN', sans-serif;
+  font-family: 'Geist', 'Inter', 'PingFang SC', 'Source Han Sans CN', sans-serif;
+}
+
+code, pre {
+  font-family: 'Geist Mono', 'Consolas', 'Monaco', monospace;
 }
 
 /* KaiTi font for student dialogue */

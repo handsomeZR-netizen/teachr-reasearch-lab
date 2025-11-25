@@ -61,7 +61,14 @@ export function Step3Simulation({
   const [showImprovementDialog, setShowImprovementDialog] = useState(false);
 
   // Update lesson plan in parent when it changes
+  // Use immediate update for first change, then debounce subsequent changes
   useEffect(() => {
+    // Immediately sync if lesson plan is not empty and parent doesn't have it
+    if (lessonPlan.trim() && !initialLessonPlan) {
+      onLessonPlanChange(lessonPlan);
+      return;
+    }
+    
     const timer = setTimeout(() => {
       if (lessonPlan !== initialLessonPlan) {
         onLessonPlanChange(lessonPlan);
@@ -79,6 +86,15 @@ export function Step3Simulation({
   const handleRequestImprovement = () => {
     setShowImprovementDialog(true);
     onRequestImprovement();
+  };
+
+  // Wrap onSendMessage to ensure lesson plan is synced before sending
+  const handleSendMessage = (content: string) => {
+    // Ensure lesson plan is synced to parent before sending
+    if (lessonPlan.trim() && lessonPlan !== initialLessonPlan) {
+      onLessonPlanChange(lessonPlan);
+    }
+    onSendMessage(content);
   };
 
   const canStartChat = lessonPlan.trim().length > 0 && selectedProfile;
@@ -154,7 +170,7 @@ export function Step3Simulation({
           <CardContent className="flex-1 p-0 overflow-hidden">
             <ChatInterface
               messages={initialMessages}
-              onSendMessage={onSendMessage}
+              onSendMessage={handleSendMessage}
               isStreaming={isStreaming}
               placeholder="输入您的教学内容或问题..."
             />

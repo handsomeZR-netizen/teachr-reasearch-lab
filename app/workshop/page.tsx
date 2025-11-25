@@ -244,16 +244,38 @@ export default function WorkshopPage() {
     const apiConfig = getDecryptedConfig();
     if (!apiConfig?.apiKey) {
       console.error('[Workshop] API config not set');
+      // Add error message to chat
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: '请先配置 API 设置后再开始对话。点击右上角的设置按钮进行配置。',
+        timestamp: Date.now(),
+      };
+      addMessage({ role: 'user', content, timestamp: Date.now() });
+      addMessage(errorMessage);
       return;
     }
 
     if (!currentSession?.data.studentProfile) {
       console.error('[Workshop] No student profile selected');
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: '请先选择一个学生画像后再开始对话。',
+        timestamp: Date.now(),
+      };
+      addMessage({ role: 'user', content, timestamp: Date.now() });
+      addMessage(errorMessage);
       return;
     }
 
     if (!currentSession?.data.lessonPlan) {
       console.error('[Workshop] No lesson plan provided');
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: '请先输入教案内容后再开始对话。',
+        timestamp: Date.now(),
+      };
+      addMessage({ role: 'user', content, timestamp: Date.now() });
+      addMessage(errorMessage);
       return;
     }
 
