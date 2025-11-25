@@ -1,112 +1,128 @@
 # 环境变量配置指南
 
-## 概述
-
-本应用支持通过环境变量配置默认的 AI API，这样部署到云端后用户可以直接使用，无需手动配置。
+本项目使用 Netlify Serverless Functions 来安全地代理 API 请求，API Key 存储在服务器端，不会暴露给客户端。
 
 ## 环境变量列表
 
-### 必需的环境变量
-
-- `NEXT_PUBLIC_DEFAULT_API_KEY` - 默认的 DeepSeek API Key
-- `NEXT_PUBLIC_DEFAULT_API_BASE_URL` - API 基础 URL（默认：`https://api.deepseek.com/v1`）
-- `NEXT_PUBLIC_DEFAULT_API_MODEL` - 使用的模型名称（默认：`deepseek-chat`）
+| 变量名 | 描述 | 存储位置 | 必需 |
+|--------|------|----------|------|
+| `DEEPSEEK_API_KEY` | DeepSeek API Key | Netlify 环境变量（服务器端） | 是（云端模式） |
 
 ## Netlify 部署配置
 
-### 方法 1：通过 netlify.toml 配置（已配置）
+### 步骤 1: 在 Netlify Dashboard 设置环境变量
 
-环境变量已在 `netlify.toml` 中配置：
+1. 登录 [Netlify Dashboard](https://app.netlify.com)
+2. 选择您的站点
+3. 进入 **Site settings** > **Environment variables**
+4. 点击 **Add a variable**
+5. 添加以下变量：
+   - Key: `DEEPSEEK_API_KEY`
+   - Value: 您的 DeepSeek API Key（例如：`sk-xxxxxxxxxxxxxxxx`）
+6. 点击 **Save**
+7. 重新部署站点以使变量生效
 
-```toml
-[build.environment]
-  NODE_VERSION = "20"
-  NEXT_PUBLIC_DEFAULT_API_KEY = "sk-b363adbc72a44d47b02f9c1cc48afb47"
-  NEXT_PUBLIC_DEFAULT_API_BASE_URL = "https://api.deepseek.com/v1"
-  NEXT_PUBLIC_DEFAULT_API_MODEL = "deepseek-chat"
-```
+### 步骤 2: 验证配置
 
-### 方法 2：通过 Netlify 控制台配置
-
-1. 登录 Netlify 控制台
-2. 进入您的站点设置
-3. 导航到 **Site settings** > **Environment variables**
-4. 添加以下环境变量：
-   - Key: `NEXT_PUBLIC_DEFAULT_API_KEY`
-   - Value: `sk-b363adbc72a44d47b02f9c1cc48afb47`
-   - Key: `NEXT_PUBLIC_DEFAULT_API_BASE_URL`
-   - Value: `https://api.deepseek.com/v1`
-   - Key: `NEXT_PUBLIC_DEFAULT_API_MODEL`
-   - Value: `deepseek-chat`
-
-5. 保存后重新部署站点
+部署后，访问您的网站：
+- 导航栏应显示 "云端" 图标（蓝色云朵）
+- 点击设置按钮，应看到 "云端 API 模式" 选项
+- 尝试使用研究工坊功能，应能正常调用 AI
 
 ## 工作原理
 
-### API Key 优先级
+```
+用户浏览器 → Netlify Function (api-proxy) → DeepSeek API
+                    ↑
+              添加 API Key
+              (从环境变量读取)
+```
 
-系统按以下优先级选择 API Key：
+1. 用户在浏览器中发起请求
+2. 请求发送到 `/.netlify/functions/api-proxy`
+3. Serverless Function 从环境变量读取 `DEEPSEEK_API_KEY`
+4. Function 将请求转发到 DeepSeek API，附带 API Key
+5. 响应返回给用户
 
-1. **用户自定义配置** - 用户在应用中手动配置的 API Key（存储在浏览器 localStorage）
-2. **环境变量** - 部署时设置的默认 API Key
-3. **空配置** - 如果以上都没有，则提示用户配置
+这种方式确保 API Key 永远不会暴露在客户端代码中。
 
-### 用户体验
+## 本地开发配置
 
-- **首次访问**：如果设置了环境变量，用户可以直接使用应用，无需配置
-- **自定义配置**：用户可以随时在设置中配置自己的 API Key，会覆盖默认配置
-- **配置提示**：如果用户正在使用默认 API，配置对话框会显示提示信息
+### 方法 1: 使用 Netlify CLI（推荐）
+
+```bash
+# 安装 Netlify CLI
+npm install -g netlify-cli
+
+# 登录 Netlify
+netlify login
+
+# 链接到您的站点
+netlify link
+
+# 启动本地开发服务器（会自动加载环境变量）
+netlify dev
+```
+
+### 方法 2: 创建本地环境变量文件
+
+创建 `.env.local` 文件（不要提交到 Git）：
+
+```bash
+DEEPSEEK_API_KEY=your-api-key-here
+```
+
+然后使用 Netlify CLI 运行：
+
+```bash
+netlify dev
+```
+
+### 方法 3: 使用自定义 API Key
+
+在本地开发时，您也可以：
+1. 打开网站
+2. 点击导航栏的设置按钮
+3. 选择 "自定义 API" 模式
+4. 输入您自己的 API Key
+
+## 获取 DeepSeek API Key
+
+1. 访问 [DeepSeek 开放平台](https://platform.deepseek.com)
+2. 注册或登录账号
+3. 进入 API Keys 页面
+4. 创建新的 API Key
+5. 复制 Key 并保存
 
 ## 安全注意事项
 
-### 免费 API Key 的限制
-
-- 默认的 API Key 是共享的，有调用次数限制
-- 建议用户配置自己的 API Key 以获得更好的性能和无限制使用
-- 在配置对话框中会显示当前是否使用默认 API
-
-### API Key 存储
-
-- 用户自定义的 API Key 使用 Base64 编码后存储在浏览器 localStorage
-- 不会上传到任何服务器
-- 仅在客户端使用
-
-## 本地开发
-
-在本地开发时，可以创建 `.env.local` 文件：
-
-```bash
-NEXT_PUBLIC_DEFAULT_API_KEY=sk-your-api-key-here
-NEXT_PUBLIC_DEFAULT_API_BASE_URL=https://api.deepseek.com/v1
-NEXT_PUBLIC_DEFAULT_API_MODEL=deepseek-chat
-```
-
-**注意**：`.env.local` 文件不应提交到 Git 仓库。
-
-## 更新 API Key
-
-如果需要更新默认的 API Key：
-
-1. 修改 `netlify.toml` 中的 `NEXT_PUBLIC_DEFAULT_API_KEY` 值
-2. 或在 Netlify 控制台更新环境变量
-3. 重新部署应用
+- ✅ API Key 存储在 Netlify 服务器端环境变量中
+- ✅ 客户端代码不包含任何 API Key
+- ✅ 所有 API 请求通过 Serverless Function 代理
+- ⚠️ 永远不要在 `netlify.toml` 或代码中硬编码 API Key
+- ⚠️ 定期轮换 API Key
+- ⚠️ 监控 API 使用量，防止滥用
 
 ## 故障排除
 
-### 环境变量未生效
+### 问题：API 调用失败，提示 "服务器未配置 API Key"
 
-1. 确认环境变量名称以 `NEXT_PUBLIC_` 开头（Next.js 要求）
-2. 在 Netlify 控制台检查环境变量是否正确设置
-3. 重新部署站点（环境变量更改需要重新构建）
+**原因**：Netlify 环境变量未设置或未生效
 
-### API 调用失败
+**解决方案**：
+1. 检查 Netlify Dashboard 中是否正确设置了 `DEEPSEEK_API_KEY`
+2. 重新部署站点（Deploys > Trigger deploy > Deploy site）
+3. 清除浏览器缓存后重试
 
-1. 检查 API Key 是否有效
-2. 检查 API 调用次数是否超限
-3. 建议用户配置自己的 API Key
+### 问题：本地开发时无法使用云端 API
+
+**原因**：本地环境没有 Netlify Functions 支持
+
+**解决方案**：
+1. 使用 `netlify dev` 命令启动开发服务器
+2. 或者切换到 "自定义 API" 模式，使用您自己的 API Key
 
 ## 相关文档
 
 - [API 配置指南](./API_CONFIGURATION_GUIDE.md)
 - [部署指南](./DEPLOYMENT_GUIDE.md)
-- [Next.js 环境变量文档](https://nextjs.org/docs/basic-features/environment-variables)

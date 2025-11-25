@@ -243,13 +243,53 @@ export class AIService {
   }
   
   /**
+   * Check if using cloud API mode
+   */
+  private isCloudAPIMode(): boolean {
+    return this.config.apiKey === '__CLOUD_API__';
+  }
+  
+  /**
    * Make a request to the AI provider API
+   * Uses serverless function proxy for cloud API mode
    */
   private async makeRequest(
     endpoint: string,
     body: any,
     signal?: AbortSignal
   ): Promise<Response> {
+    // For cloud API mode, use the serverless function proxy
+    if (this.isCloudAPIMode()) {
+      const proxyUrl = `/.netlify/functions/api-proxy?endpoint=${encodeURIComponent(endpoint)}`;
+      
+      const response = await fetch(proxyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        signal,
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => response.statusText);
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText };
+        }
+        throw {
+          status: response.status,
+          statusText: response.statusText,
+          message: errorData.message || response.statusText,
+        };
+      }
+      
+      return response;
+    }
+    
+    // For custom API mode, make direct request
     this.validateConfig();
     
     const url = `${this.config.baseURL}${endpoint}`;

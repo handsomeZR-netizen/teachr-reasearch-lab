@@ -231,6 +231,7 @@ export function APIConfigDialog({ open, onOpenChange }: APIConfigDialogProps) {
                 <p className="font-medium text-primary mb-1">云端 API 模式</p>
                 <p className="text-text-secondary">
                   系统将使用预配置的 DeepSeek API，无需任何设置即可开始使用。
+                  API 请求通过安全的服务器代理，您的使用完全免费。
                   如果遇到调用限制，可以切换到自定义 API 模式。
                 </p>
               </div>

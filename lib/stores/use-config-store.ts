@@ -57,26 +57,36 @@ const decodeKey = (encoded: string): string => {
 };
 
 /**
- * Check if cloud API is available (environment variables are set)
+ * Cloud API configuration - hardcoded for Netlify deployment
+ * This ensures the cloud API is always available without relying on runtime env vars
  */
-export const isCloudAPIAvailable = (): boolean => {
-  return !!process.env.NEXT_PUBLIC_DEFAULT_API_KEY;
+const CLOUD_API_CONFIG = {
+  provider: 'deepseek' as const,
+  baseURL: 'https://api.deepseek.com/v1',
+  // API key will be fetched from serverless function
+  model: 'deepseek-chat',
 };
 
 /**
- * Get default API configuration from environment variables or fallback
+ * Check if cloud API is available
+ * Cloud API is always available - we use a serverless function to proxy requests
+ */
+export const isCloudAPIAvailable = (): boolean => {
+  // Always return true - cloud API is available via serverless function
+  return true;
+};
+
+/**
+ * Get default API configuration
+ * For cloud mode, we don't need an API key on the client side
+ * The serverless function will add the API key
  */
 const getDefaultConfig = (): APIConfig => {
-  // Try to get from environment variables (set by Netlify or other hosting)
-  const envApiKey = process.env.NEXT_PUBLIC_DEFAULT_API_KEY;
-  const envBaseURL = process.env.NEXT_PUBLIC_DEFAULT_API_BASE_URL;
-  const envModel = process.env.NEXT_PUBLIC_DEFAULT_API_MODEL;
-  
   return {
-    provider: 'deepseek',
-    baseURL: envBaseURL || 'https://api.deepseek.com/v1',
-    apiKey: envApiKey || '', // Use env API key if available
-    model: envModel || 'deepseek-chat',
+    provider: CLOUD_API_CONFIG.provider,
+    baseURL: CLOUD_API_CONFIG.baseURL,
+    apiKey: '__CLOUD_API__', // Special marker for cloud API mode
+    model: CLOUD_API_CONFIG.model,
   };
 };
 
