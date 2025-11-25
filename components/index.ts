@@ -11,3 +11,4 @@ export type { CaseCardProps } from './case-card';
 export { StudentProfileSelector } from './student-profile-selector';
 export { ChatInterface } from './chat-interface';
 export { RadarChart, RadarChartCard } from './radar-chart';
+export { FullCaseContent } from './full-case-content';

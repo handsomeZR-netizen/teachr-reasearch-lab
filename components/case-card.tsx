@@ -22,6 +22,7 @@ export interface CaseCardProps {
   author: string;
   likes: number;
   imageUrl?: string;
+  isFeatured?: boolean;
 }
 
 export function CaseCard({
@@ -33,11 +34,17 @@ export function CaseCard({
   author,
   likes,
   imageUrl,
+  isFeatured,
 }: CaseCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/cases/${id}`);
+    // 精选案例跳转到专门的完整案例页面
+    if (isFeatured) {
+      router.push('/cases/featured');
+    } else {
+      router.push(`/cases/${id}`);
+    }
   };
 
   return (
@@ -75,11 +82,16 @@ export function CaseCard({
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="absolute top-2 left-2 sm:top-3 sm:left-3"
+            className="absolute top-2 left-2 sm:top-3 sm:left-3 flex gap-1"
           >
             <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-primary text-white text-xs sm:text-sm rounded-full shadow-lg">
               {subject}
             </span>
+            {isFeatured && (
+              <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-yellow-400 text-yellow-900 text-xs sm:text-sm rounded-full shadow-lg font-medium">
+                ⭐ 完整案例
+              </span>
+            )}
           </motion.div>
         </div>
 

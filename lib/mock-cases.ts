@@ -18,6 +18,7 @@ export interface CaseData {
   literatureReview: string;
   teachingApproach: string;
   findings: string;
+  isFeatured?: boolean; // 是否为精选完整案例
 }
 
 export const MOCK_CASES: CaseData[] = [
@@ -36,6 +37,7 @@ export const MOCK_CASES: CaseData[] = [
     literatureReview: '函数概念是高中数学的核心内容，Dubinsky (1991) 的APOS理论指出...',
     teachingApproach: '采用"具体→抽象→应用"的三阶段教学法...',
     findings: '研究发现，通过模拟教学，B类学生在引入生活实例后理解度提升40%...',
+    isFeatured: true, // 精选完整案例
   },
   {
     id: 'math-002',

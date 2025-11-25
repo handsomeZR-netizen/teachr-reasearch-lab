@@ -121,6 +121,7 @@ export default function CasesPage() {
                     author={caseData.author}
                     likes={caseData.likes}
                     imageUrl={caseData.imageUrl}
+                    isFeatured={caseData.isFeatured}
                   />
                 </motion.div>
               ))
